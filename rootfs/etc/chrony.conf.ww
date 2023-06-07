@@ -1,0 +1,47 @@
+# Upstream servers, add to node/profile with --tag=chrony_server1=IPADDRESS ...
+{{ if .Tags.chrony_server1 -}}
+server {{ .Tags.chrony_server1 }}
+{{ end -}}
+{{ if .Tags.chrony_server2 -}}
+server {{ .Tags.chrony_server2 }}
+{{ end -}}
+{{ if .Tags.chrony_server3 -}}
+server {{ .Tags.chrony_server3 }}
+{{ end -}}
+
+# Record the rate at which the system clock gains/losses time.
+driftfile /var/lib/chrony/drift
+
+# Allow the system clock to be stepped in the first three updates
+# if its offset is larger than 1 second.
+makestep 1.0 3
+
+# Enable kernel synchronization of the real-time clock (RTC).
+rtcsync
+
+# Enable hardware timestamping on all interfaces that support it.
+#hwtimestamp *
+
+# Increase the minimum number of selectable sources required to adjust
+# the system clock.
+#minsources 2
+
+# Allow this section to enable client with --tag=chrony_allow_subnets=NETWORK/PREFIX
+{{ if .Tags.chrony_allow_subnets -}}
+# Allow NTP client access from local network.
+allow {{ .Tags.chrony_allow_subnets }}
+# Serve time even if not synchronized to a time source.
+local stratum 10
+{{ end -}}
+
+# Specify file containing keys for NTP authentication.
+keyfile /etc/chrony.keys
+
+# Get TAI-UTC offset and leap seconds from the system tz database.
+leapsectz right/UTC
+
+# Specify directory for log files.
+logdir /var/log/chrony
+
+# Select which information is logged.
+#log measurements statistics tracking
